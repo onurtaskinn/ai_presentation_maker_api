@@ -1,0 +1,9 @@
+venv
+.env
+__pycache__
+__garbage__
+__init__.py
+_setup_venv
+_app_choices
+_garbage.txt
+_outputs

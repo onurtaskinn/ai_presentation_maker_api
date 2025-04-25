@@ -1,0 +1,229 @@
+# API Endpoint Examples
+
+## 1. Generate Outline
+**Endpoint:** POST /generate-outline
+
+```json
+{
+  "topic": "AI in Healthcare",
+  "slide_count": 7
+}
+```
+
+## 2. Test Outline
+**Endpoint:** POST /test-outline
+
+```json
+{
+  "topic": "AI in Healthcare",
+  "outline": {
+    "presentation_title": "Revolutionizing Healthcare with AI: Current Applications and Future Possibilities",
+    "slide_outlines": [
+      {
+        "slide_title": "Introduction to AI in Healthcare",
+        "slide_focus": "AI is transforming healthcare through improved diagnostics, personalized treatment, and operational efficiency.",
+        "slide_number": 1
+      },
+      {
+        "slide_title": "AI-Powered Diagnostics",
+        "slide_focus": "AI algorithms can detect patterns in medical images with higher accuracy than human experts in some cases.",
+        "slide_number": 2
+      },
+      {
+        "slide_title": "Personalized Treatment Plans",
+        "slide_focus": "AI enables treatment customization based on patient-specific data and outcomes from similar cases.",
+        "slide_number": 3
+      },
+      {
+        "slide_title": "Hospital Operations Optimization",
+        "slide_focus": "AI improves resource allocation, scheduling, and workflow management in healthcare facilities.",
+        "slide_number": 4
+      },
+      {
+        "slide_title": "Ethical Considerations",
+        "slide_focus": "AI implementation in healthcare raises important questions about data privacy, algorithm bias, and human oversight.",
+        "slide_number": 5
+      },
+      {
+        "slide_title": "Future Developments",
+        "slide_focus": "Emerging AI technologies will continue to revolutionize patient care through predictive analytics and robotic assistance.",
+        "slide_number": 6
+      },
+      {
+        "slide_title": "Conclusion: The Human-AI Partnership",
+        "slide_focus": "The most effective healthcare model combines AI capabilities with human expertise and empathy.",
+        "slide_number": 7
+      }
+    ]
+  }
+}
+```
+
+## 3. Fix Outline
+**Endpoint:** POST /fix-outline
+
+```json
+{
+  "outline": {
+    "presentation_title": "Revolutionizing Healthcare with AI: Current Applications and Future Possibilities",
+    "slide_outlines": [
+      {
+        "slide_title": "Introduction to AI in Healthcare",
+        "slide_focus": "AI is transforming healthcare through improved diagnostics, personalized treatment, and operational efficiency.",
+        "slide_number": 1
+      },
+      {
+        "slide_title": "AI-Powered Diagnostics",
+        "slide_focus": "AI algorithms can detect patterns in medical images with higher accuracy than human experts in some cases.",
+        "slide_number": 2
+      },
+      {
+        "slide_title": "Personalized Treatment Plans",
+        "slide_focus": "AI enables treatment customization based on patient-specific data and outcomes from similar cases.",
+        "slide_number": 3
+      },
+      {
+        "slide_title": "Hospital Operations Optimization",
+        "slide_focus": "AI improves resource allocation, scheduling, and workflow management in healthcare facilities.",
+        "slide_number": 4
+      },
+      {
+        "slide_title": "Ethical Considerations",
+        "slide_focus": "AI implementation in healthcare raises important questions about data privacy, algorithm bias, and human oversight.",
+        "slide_number": 5
+      },
+      {
+        "slide_title": "Future Developments",
+        "slide_focus": "Emerging AI technologies will continue to revolutionize patient care through predictive analytics and robotic assistance.",
+        "slide_number": 6
+      },
+      {
+        "slide_title": "Conclusion: The Human-AI Partnership",
+        "slide_focus": "The most effective healthcare model combines AI capabilities with human expertise and empathy.",
+        "slide_number": 7
+      }
+    ]
+  },
+  "feedback": "The presentation lacks a clear example of real-world AI applications in healthcare. Slide 2 and 3 need more specific focus on actual implementations rather than general capabilities.",
+  "score": 75
+}
+```
+
+## 4. Generate Content
+**Endpoint:** POST /generate-content
+
+```json
+{
+  "presentation_title": "Revolutionizing Healthcare with AI: Current Applications and Future Possibilities",
+  "slide": {
+    "slide_title": "AI-Powered Diagnostics",
+    "slide_focus": "AI algorithms can detect patterns in medical images with higher accuracy than human experts in some cases.",
+    "slide_number": 2
+  }
+}
+```
+
+## 5. Test Content
+**Endpoint:** POST /test-content
+
+```json
+{
+  "presentation_title": "Revolutionizing Healthcare with AI: Current Applications and Future Possibilities",
+  "slide": {
+    "slide_title": "AI-Powered Diagnostics",
+    "slide_focus": "AI algorithms can detect patterns in medical images with higher accuracy than human experts in some cases.",
+    "slide_number": 2
+  },
+  "content": {
+    "slide_onscreen_text": "<h2>AI-Powered Diagnostics</h2><ul><li>Radiological image analysis</li><li>Pathology slide interpretation</li><li>Early disease detection</li><li>Case study: Google's DeepMind for retinal scans</li></ul>",
+    "slide_voiceover_text": "AI is revolutionizing medical diagnostics, particularly in image analysis. Machine learning algorithms now match or exceed human performance in analyzing radiological images and pathology slides. For example, Google's DeepMind AI can detect over 50 eye diseases from retinal scans with 94% accuracy, helping doctors identify serious conditions earlier and with greater precision. These AI systems work continuously without fatigue, potentially increasing diagnostic throughput while maintaining high accuracy.",
+    "slide_image_prompt": "Create a professional, clean medical image showing an AI system analyzing medical scans. Show a split screen with brain MRI scans on computer monitors with AI highlighting potential anomalies in blue. Include a subtle healthcare professional reviewing the results in the foreground. Use a cool blue and white color palette typical of medical environments. The style should be realistic but slightly stylized, appropriate for a professional healthcare presentation."
+  }
+}
+```
+
+## 6. Fix Content
+**Endpoint:** POST /fix-content
+
+```json
+{
+  "presentation_title": "Revolutionizing Healthcare with AI: Current Applications and Future Possibilities",
+  "slide": {
+    "slide_title": "AI-Powered Diagnostics",
+    "slide_focus": "AI algorithms can detect patterns in medical images with higher accuracy than human experts in some cases.",
+    "slide_number": 2
+  },
+  "content": {
+    "slide_onscreen_text": "<h2>AI-Powered Diagnostics</h2><ul><li>Radiological image analysis</li><li>Pathology slide interpretation</li><li>Early disease detection</li><li>Case study: Google's DeepMind for retinal scans</li></ul>",
+    "slide_voiceover_text": "AI is revolutionizing medical diagnostics, particularly in image analysis. Machine learning algorithms now match or exceed human performance in analyzing radiological images and pathology slides. For example, Google's DeepMind AI can detect over 50 eye diseases from retinal scans with 94% accuracy, helping doctors identify serious conditions earlier and with greater precision. These AI systems work continuously without fatigue, potentially increasing diagnostic throughput while maintaining high accuracy.",
+    "slide_image_prompt": "Create a professional, clean medical image showing an AI system analyzing medical scans. Show a split screen with brain MRI scans on computer monitors with AI highlighting potential anomalies in blue. Include a subtle healthcare professional reviewing the results in the foreground. Use a cool blue and white color palette typical of medical environments. The style should be realistic but slightly stylized, appropriate for a professional healthcare presentation."
+  },
+  "feedback": "The onscreen text lacks specific performance metrics that would strengthen the message. The voiceover is too long and contains information not reflected in the onscreen text.",
+  "score": 12
+}
+```
+
+## 7. Generate Image
+**Endpoint:** POST /generate-image
+
+```json
+{
+  "image_prompt": "Create a professional, clean medical image showing an AI system analyzing medical scans. Show a split screen with brain MRI scans on computer monitors with AI highlighting potential anomalies in blue. Include a subtle healthcare professional reviewing the results in the foreground. Use a cool blue and white color palette typical of medical environments. The style should be realistic but slightly stylized, appropriate for a professional healthcare presentation.",
+  "quality": "medium"
+}
+```
+
+## 8. Test Image
+**Endpoint:** POST /test-image
+
+```json
+{
+  "image_url": "https://example.com/generated-image-url.jpg",
+  "content": {
+    "slide_onscreen_text": "<h2>AI-Powered Diagnostics</h2><ul><li>Radiological image analysis</li><li>Pathology slide interpretation</li><li>Early disease detection</li><li>Case study: Google's DeepMind for retinal scans</li></ul>",
+    "slide_voiceover_text": "AI is revolutionizing medical diagnostics, particularly in image analysis. Machine learning algorithms now match or exceed human performance in analyzing radiological images and pathology slides. For example, Google's DeepMind AI can detect over 50 eye diseases from retinal scans with 94% accuracy, helping doctors identify serious conditions earlier and with greater precision. These AI systems work continuously without fatigue, potentially increasing diagnostic throughput while maintaining high accuracy.",
+    "slide_image_prompt": "Create a professional, clean medical image showing an AI system analyzing medical scans. Show a split screen with brain MRI scans on computer monitors with AI highlighting potential anomalies in blue. Include a subtle healthcare professional reviewing the results in the foreground. Use a cool blue and white color palette typical of medical environments. The style should be realistic but slightly stylized, appropriate for a professional healthcare presentation."
+  }
+}
+```
+
+## 9. Fix Image Prompt
+**Endpoint:** POST /fix-image-prompt
+
+```json
+{
+  "content": {
+    "slide_onscreen_text": "<h2>AI-Powered Diagnostics</h2><ul><li>Radiological image analysis</li><li>Pathology slide interpretation</li><li>Early disease detection</li><li>Case study: Google's DeepMind for retinal scans</li></ul>",
+    "slide_voiceover_text": "AI is revolutionizing medical diagnostics, particularly in image analysis. Machine learning algorithms now match or exceed human performance in analyzing radiological images and pathology slides. For example, Google's DeepMind AI can detect over 50 eye diseases from retinal scans with 94% accuracy, helping doctors identify serious conditions earlier and with greater precision. These AI systems work continuously without fatigue, potentially increasing diagnostic throughput while maintaining high accuracy.",
+    "slide_image_prompt": "Create a professional, clean medical image showing an AI system analyzing medical scans. Show a split screen with brain MRI scans on computer monitors with AI highlighting potential anomalies in blue. Include a subtle healthcare professional reviewing the results in the foreground. Use a cool blue and white color palette typical of medical environments. The style should be realistic but slightly stylized, appropriate for a professional healthcare presentation."
+  },
+  "validation_result": {
+    "feedback": "The generated image includes text labels on the medical scans, which violates our requirement of no text in images. The composition is also too complex, making it hard to understand at a glance.",
+    "suggestions": "Simplify the image by focusing on just one scan instead of multiple. Remove all text elements. Make the AI-highlighted anomalies more distinctive with a stronger color contrast.",
+    "score": 7
+  }
+}
+```
+
+## 10. Generate Full Presentation
+**Endpoint:** POST /generate-presentation
+
+```json
+{
+  "topic": "AI in Healthcare",
+  "slide_count": 7,
+  "image_quality": "medium"
+}
+```
+
+## 11. Get Presentation Status
+**Endpoint:** GET /presentation/{presentation_id}
+
+No request body needed, just use the presentation_id in the URL.
+
+Example URL: `/presentation/550e8400-e29b-41d4-a716-446655440000`
+
+## 12. List All Presentations
+**Endpoint:** GET /presentations
+
+No request body needed.
