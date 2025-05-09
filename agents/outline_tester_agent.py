@@ -1,5 +1,5 @@
 #%%
-from utils.datamodels import PresentationOutline, TopicCount, ValidationWithOutline, OutlineValidationResult
+from data.datamodels import PresentationOutline, TopicCount, ValidationWithOutline, OutlineValidationResult
 from utils.prompts import outline_tester_system_message, outline_tester_user_message
 import os, instructor
 from anthropic import Anthropic

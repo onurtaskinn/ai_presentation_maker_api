@@ -2,7 +2,7 @@ import streamlit as st
 from agents.outline_initial_generator_agent import call_outline_initial_generator_agent
 from agents.outline_tester_agent import call_outline_tester_agent
 from agents.outline_fixer_agent import call_outline_fixer_agent
-from utils.datamodels import TopicCount
+from data.datamodels import TopicCount
 import json
 from utils.logging import log_step
 

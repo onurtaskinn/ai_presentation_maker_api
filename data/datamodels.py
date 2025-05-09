@@ -1,6 +1,18 @@
 from pydantic import BaseModel, Field
 from typing import List
 
+
+class Credentials(BaseModel):
+    client_id: str
+    client_secret: str
+
+class CredentialsCheckResult(BaseModel):
+    is_valid: bool
+    message: str
+
+
+
+
 class TopicCount(BaseModel):
     presentation_topic: str = Field(description="Topic of the presentation")
     slide_count: int = Field(description="The number of slides that will be generated for this presentation")

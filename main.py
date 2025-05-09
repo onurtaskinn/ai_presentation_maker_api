@@ -1,7 +1,7 @@
 import os
 import time
 from dotenv import load_dotenv
-from utils.datamodels import TopicCount, SlideContent, ValidationWithOutline, ImageValidationWithSlideContent
+from data.datamodels import TopicCount, SlideContent, ValidationWithOutline, ImageValidationWithSlideContent
 
 # Import generator agents
 from agents.outline_initial_generator_agent import call_outline_initial_generator_agent

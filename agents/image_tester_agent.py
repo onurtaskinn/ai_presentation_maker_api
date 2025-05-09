@@ -1,5 +1,5 @@
 #%%
-from utils.datamodels import ImageValidationResult, SlideContent, ImageValidationWithSlideContent
+from data.datamodels import ImageValidationResult, SlideContent, ImageValidationWithSlideContent
 from utils.prompts import image_tester_system_message, image_tester_user_message
 
 from anthropic import Anthropic

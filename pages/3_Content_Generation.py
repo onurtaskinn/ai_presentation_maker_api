@@ -10,7 +10,7 @@ from agents.speech_generator import call_speech_generator
 import json
 from datetime import datetime
 from utils.logging import save_logs, log_step
-from utils.datamodels import SlideContent
+from data.datamodels import SlideContent
 
 CONTENT_THRESHOLD_SCORE = 0
 IMAGE_THRESHOLD_SCORE = 0

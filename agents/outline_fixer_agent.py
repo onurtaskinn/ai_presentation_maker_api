@@ -1,5 +1,5 @@
 #%%
-from utils.datamodels import PresentationOutline, ValidationWithOutline
+from data.datamodels import PresentationOutline, ValidationWithOutline
 from utils.prompts import outline_fixer_system_message, outline_fixer_user_message
 
 import os, instructor

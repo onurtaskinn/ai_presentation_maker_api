@@ -1,5 +1,5 @@
 #%%
-from utils.datamodels import SlideOutline, SlideContent
+from data.datamodels import SlideOutline, SlideContent
 from utils.prompts import content_initial_generator_system_message, content_initial_generator_user_message
 
 import os

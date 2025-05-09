@@ -1,5 +1,5 @@
 #%%
-from utils.datamodels import RegeneratedPrompt, ImageValidationWithSlideContent, SlideContent
+from data.datamodels import RegeneratedPrompt, ImageValidationWithSlideContent, SlideContent
 from utils.prompts import image_fixer_system_message, image_fixer_user_message
 
 from anthropic import Anthropic

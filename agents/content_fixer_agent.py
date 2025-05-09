@@ -1,5 +1,5 @@
 #%%
-from utils.datamodels import SlideOutline, SlideContent, ContentValidationResult
+from data.datamodels import SlideOutline, SlideContent, ContentValidationResult
 from utils.prompts import content_fixer_system_message, content_fixer_user_message
 
 import os
