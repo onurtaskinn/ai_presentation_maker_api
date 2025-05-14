@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import List
+from typing import List, Dict, Any, Optional
 
 
 class Credentials(BaseModel):
@@ -74,3 +74,36 @@ class SlideExportData(BaseModel):
     slide_voiceover_text: str = Field(description="The text for the voiceover of this particular slide")
     slide_image_prompt: str = Field(description="A detailed prompt text to generate an image for this particular slide. This is always in English regardless of the language of the presentation")
     slide_image_url: str = Field(description="The URL of the generated image for this particular slide")
+
+
+
+# Add these to the existing data/datamodels.py file
+
+class TopicRequest(BaseModel):
+    topic: str = Field(..., description="Topic of the presentation")
+    slide_count: int = Field(..., ge=2, le=15, description="Number of slides")
+
+class OutlineRequest(BaseModel):
+    topic: str = Field(..., description="Topic of the presentation")
+    slide_count: int = Field(..., ge=2, le=15, description="Number of slides")
+
+class ContentRequest(BaseModel):
+    presentation_title: str = Field(..., description="Title of the presentation")
+    slide: SlideOutline = Field(..., description="Slide outline information")
+
+class ImageRequest(BaseModel):
+    image_prompt: str = Field(..., description="Prompt for image generation")
+    quality: str = Field("medium", description="Image quality (low, medium, high)")
+
+class FullPresentationRequest(BaseModel):
+    topic: str = Field(..., description="Topic of the presentation")
+    slide_count: int = Field(..., ge=2, le=15, description="Number of slides")
+    image_quality: str = Field("medium", description="Image quality (low, medium, high)")
+    generate_voiceover: bool = Field(False, description="Whether to generate voiceover")
+    is_agentic: bool = Field(False, description="Whether the presentation is agentic")
+    organization_code: Optional[str] = Field(None, description="Organization code")
+
+class PresentationStatusResponse(BaseModel):
+    presentation_id: str
+    status: str
+    progress: Optional[Dict[str, Any]] = None
