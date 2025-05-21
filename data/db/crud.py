@@ -1,7 +1,7 @@
 # data/db/crud.py
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
-from data.db.models import CLIENT_INFORMATION, PRESENTATION_HISTORY, PRESENTATION_SLIDES
+from data.db.models import CLIENT_INFORMATION, PRESENTATION_HISTORY, PRESENTATION_SLIDES, PS_VOICES
 from data.db import schemas
 
 # CRUD operations for CLIENT_INFORMATION
@@ -116,3 +116,9 @@ def get_full_presentation_with_slides(db: Session, presentation_id: str):
     presentation_data.slides = [schemas.PRESENTATION_SLIDES.from_orm(slide) for slide in slides]
     
     return presentation_data
+
+
+# CRUD operations for PS_VOICES
+
+def get_voice_setting(db: Session, voice_setting_id: int):
+    return db.query(PS_VOICES).filter(PS_VOICES.id == voice_setting_id).first()

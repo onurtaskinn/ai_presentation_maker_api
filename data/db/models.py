@@ -42,3 +42,19 @@ class PRESENTATION_SLIDES(Base):
     
     # Define the relationship with PRESENTATION_HISTORY
     presentation = relationship("PRESENTATION_HISTORY", back_populates="slides")
+
+
+
+class PS_VOICES(Base):
+    __tablename__ = 'PS_VOICES'
+    id = Column(Integer, primary_key=True, index=True)
+    personality_id = Column(Integer, ForeignKey('PS_PERSONALITY_TYPES.id'))
+    elevenlabs_voice_name = Column(String(500))
+    elevenlabs_voice_id = Column(String(500))
+    elevenlabs_tts_model = Column(String(100))
+    elevenlabs_voice_description = Column(String)
+    voice_speed = Column(Float)
+    voice_stability = Column(Float)
+    voice_similarity = Column(Float)
+    status = Column(Integer)
+    created_on = Column(DateTime, default=lambda: datetime.now(timezone.utc))

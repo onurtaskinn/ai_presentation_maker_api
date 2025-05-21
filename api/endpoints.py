@@ -1,7 +1,7 @@
 # api/endpoints.py
 from fastapi import HTTPException, Depends, Request
 from fastapi.security import HTTPAuthorizationCredentials
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional
 import json
 from datetime import datetime
 
@@ -447,5 +447,34 @@ async def get_complete_presentation(
     
     return presentation_response
 
+
+@app.get("/voice-settings/{voice_setting_id}", response_model=Dict[str, Any])
+async def get_voice_setting(
+    request: Request,
+    voice_setting_id: int,
+    credentials: HTTPAuthorizationCredentials = Depends(auth_middleware.check_auth),
+    db: Session = Depends(get_db)
+):
+    """Get a specific voice setting by ID"""
+
+    from data.db.schemas import VOICE_SETTINGS
+    print(f"Fetching voice setting with ID: {voice_setting_id}")    
+    try:
+        print("1")
+        voice_setting = crud.get_voice_setting(db, voice_setting_id)
+        voice_setting = VOICE_SETTINGS.model_validate(voice_setting)
+
+
+        print("2")
+        print(f"Voice setting fetched: {voice_setting}")
+        if not voice_setting:
+            raise HTTPException(status_code=404, detail="Voice setting not found")
+        
+        return {
+            "status": "success",
+            "data": voice_setting.elevenlabs_voice_id
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 

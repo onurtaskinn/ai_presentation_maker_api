@@ -102,6 +102,7 @@ class FullPresentationRequest(BaseModel):
     generate_voiceover: bool = Field(False, description="Whether to generate voiceover")
     is_agentic: bool = Field(False, description="Whether the presentation is agentic")
     organization_code: Optional[str] = Field(None, description="Organization code")
+    voice_id: Optional[int] = Field(None, description="Voice ID for voiceover generation")
 
 class PresentationStatusResponse(BaseModel):
     presentation_id: str

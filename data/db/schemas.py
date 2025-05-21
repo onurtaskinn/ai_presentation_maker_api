@@ -82,3 +82,22 @@ class PresentationResponseSchema(BaseModel):
     slides: List[SlideResponseSchema] = []
     
     model_config = model_config
+
+
+# Voice Settings Schemas
+
+
+class VOICE_SETTINGS(BaseModel):
+    id: int
+    personality_id: int
+    elevenlabs_voice_name: str
+    elevenlabs_voice_id: str
+    elevenlabs_tts_model: str
+    elevenlabs_voice_description: Optional[str] = None
+    voice_speed: float = 1.0
+    voice_stability: float = 0.5
+    voice_similarity: float = 0.75
+    status: int = 1
+    created_on: datetime    
+    
+    model_config = model_config

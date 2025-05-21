@@ -38,7 +38,19 @@ from agents.voice_helper import generate_speech_with_elevenlabs, delete_director
 
 
 
-async def generate_full_presentation_task(presentation_id: str, topic: str, slide_count: int, image_quality: str, generate_voiceover:bool, is_agentic: bool, client_id: str, organization_code: str = None, db: Session = None):
+async def generate_full_presentation_task(
+        presentation_id: str, 
+        topic: str, 
+        slide_count: int, 
+        image_quality: str, 
+        generate_voiceover:bool, 
+        is_agentic: bool, 
+        client_id: str, 
+        voice_id: int = 1,
+        organization_code: str = None, 
+        db: Session = None):
+    
+
     start_time = time.time()
     total_tokens = 0
     
@@ -173,7 +185,10 @@ async def generate_full_presentation_task(presentation_id: str, topic: str, slid
 
                         # example voice id
 
-                        elevenlabs_voice_id = "cSOzJY9EgVHKMqwo9j1H"  # default voice id for the host
+                        voice_db = crud.get_voice_setting(db, voice_id)
+                        voice = schemas.VOICE_SETTINGS.model_validate(voice_db)
+                        elevenlabs_voice_id = voice.elevenlabs_voice_id
+
 
                         voiceover_filepath = generate_speech_with_elevenlabs(
                             elevenlabs_voice_id=elevenlabs_voice_id,
@@ -288,9 +303,9 @@ async def generate_full_presentation_task(presentation_id: str, topic: str, slid
                             speed=1.05,
                         )
 
-                        # example voice id
-
-                        elevenlabs_voice_id = "cSOzJY9EgVHKMqwo9j1H"  # default voice id for the host
+                        voice_db = crud.get_voice_setting(db, voice_id)
+                        voice = schemas.VOICE_SETTINGS.model_validate(voice_db)
+                        elevenlabs_voice_id = voice.elevenlabs_voice_id
 
 
                         voiceover_filepath = generate_speech_with_elevenlabs(
@@ -383,7 +398,8 @@ async def generate_presentation_sync(
             "slide_count": presentation_req.slide_count,
             "image_quality": presentation_req.image_quality,
             "is_agentic": presentation_req.is_agentic,
-            "organization_code": presentation_req.organization_code
+            "organization_code": presentation_req.organization_code,
+            "voice_id": presentation_req.voice_id
         }
     }
     
@@ -396,6 +412,7 @@ async def generate_presentation_sync(
         generate_voiceover=presentation_req.generate_voiceover,
         is_agentic=presentation_req.is_agentic,
         client_id=client_id,
+        voice_id=presentation_req.voice_id,
         organization_code=presentation_req.organization_code,
         db=db
     )
