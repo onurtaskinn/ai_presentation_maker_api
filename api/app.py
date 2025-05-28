@@ -15,9 +15,9 @@ ACCESS_TOKEN_EXPIRE_HOURS = 24
 
 # Mapping for image quality to model
 IMAGE_QUALITY_MODELS = {
-    "low": "fal-ai/recraft-20b",
-    "medium": "fal-ai/imagen3",
-    "high": "fal-ai/flux-pro/v1.1"
+    "low": "fal-ai/flux/dev",
+    "medium": "fal-ai/recraft-20b",
+    "high": "fal-ai/imagen3"
 }
 
 # In-memory storage for presentations
