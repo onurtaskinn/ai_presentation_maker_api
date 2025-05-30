@@ -217,10 +217,9 @@ Evaluation Criteria:
 - Misaligned content elements
 - Unclear or confusing message
 - Missing or incomplete components
-- Technical errors in HTML markup or language
 
 
-2. Quality Scoring (Total: 17 points)
+2. Quality Scoring (Total: 15 points)
 
 Content Coherence (6 points):
 - Alignment between onscreen text, voiceover, and image prompt - (2 points)
@@ -234,8 +233,7 @@ Multimedia Design (5 points):
 - Voiceover text completeness - (1 point)
 - Image prompt relevance and enhancement - (1 point)
 
-Technical Quality (6 points):
-- Correct HTML markup usage - (2 points)
+Technical Quality (4 points):
 - Language consistency - (2 points)
 - Image prompt clarity and specificity - (1 points)
 - Professional tone - (1 point)
@@ -281,7 +279,6 @@ Follow these revision guidelines:
 - Verify changes don't create new issues
 
 2. Technical Requirements:
-- Use correct HTML markup
 - Write detailed, specific image prompts
 - Maintain consistent language and tone
 - Keep onscreen text concise and impactful
@@ -294,7 +291,7 @@ Follow these revision guidelines:
 - Preserve the original message while improving delivery
 
 Your output must provide:
-1. Revised onscreen text with proper HTML markup
+1. Revised onscreen text
 2. Updated voiceover text that complements the visuals
 3. Enhanced image prompt that aligns with the content
 

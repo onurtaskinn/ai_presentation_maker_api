@@ -200,13 +200,14 @@ async def generate_full_presentation_task(
                         print(f"Generated voiceover for slide {i+1}: {voiceover_filepath}") 
                         
 
-                    
+                    merged_onscreen_text = "\n".join(content.slide_onscreen_text.text_list)
+
                     # Create a slide dict for in-memory storage
                     slide_data = {
                         "number": i+1,
                         "title": slide.slide_title,
                         "focus": slide.slide_focus,
-                        "onscreen_text": content.slide_onscreen_text,
+                        "onscreen_text": merged_onscreen_text,
                         "voiceover_text": content.slide_voiceover_text,
                         "image_prompt": content.slide_image_prompt,
                         "image_url": image_url
@@ -216,12 +217,13 @@ async def generate_full_presentation_task(
                     presentation_data["slides"].append(slide_data)
                     
                     # Create slide data for database
+
                     slide_to_save = schemas.PRESENTATION_SLIDESCreate(
                         presentation_id=presentation_id,
                         slide_number=i+1,
                         slide_title=slide.slide_title,
                         slide_focus=slide.slide_focus,
-                        onscreen_text=content.slide_onscreen_text,
+                        onscreen_text=merged_onscreen_text,
                         voiceover_text=content.slide_voiceover_text,
                         image_prompt=content.slide_image_prompt,
                         image_url=image_url
@@ -317,12 +319,14 @@ async def generate_full_presentation_task(
                         )
                         print(f"Generated voiceover for slide {i+1}: {voiceover_filepath}")                     
                                     
+                    merged_onscreen_text = "\n".join(content.slide_onscreen_text.text_list)
+
                     # Create a slide dict for in-memory storage
                     slide_data = {
                         "number": i+1,
                         "title": slide.slide_title,
                         "focus": slide.slide_focus,
-                        "onscreen_text": content.slide_onscreen_text,
+                        "onscreen_text": merged_onscreen_text,
                         "voiceover_text": content.slide_voiceover_text,
                         "image_prompt": content.slide_image_prompt,
                         "image_url": image_url
@@ -337,7 +341,7 @@ async def generate_full_presentation_task(
                         slide_number=i+1,
                         slide_title=slide.slide_title,
                         slide_focus=slide.slide_focus,
-                        onscreen_text=content.slide_onscreen_text,
+                        onscreen_text=merged_onscreen_text,
                         voiceover_text=content.slide_voiceover_text,
                         image_prompt=content.slide_image_prompt,
                         image_url=image_url
@@ -379,7 +383,6 @@ async def generate_full_presentation_task(
 async def generate_presentation_sync(
     request: Request,
     presentation_req: FullPresentationRequest, 
-    return_audio: bool = True, 
     credentials: HTTPAuthorizationCredentials = Depends(auth_middleware.check_auth),
     db: Session = Depends(get_db)
 ):
@@ -426,27 +429,27 @@ async def generate_presentation_sync(
         }
     
 
-    if return_audio and presentation_req.generate_voiceover:
 
-        json_data = {
-            "presentation_id": presentation_id,
-            "status": "completed",
-            "data": presentations[presentation_id]["data"]
-        }        
+    json_data = {
+        "presentation_id": presentation_id,
+        "status": "completed",
+        "data": presentations[presentation_id]["data"]
+    }        
+    
+    # Create a zip file in memory
+    zip_buffer = io.BytesIO()
+    with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
+
+        json_str = json.dumps(json_data, indent=2, ensure_ascii=False)
+        json_bytes = json_str.encode('utf-8')
+
+        zip_file.writestr("presentation_data.json", json_bytes)
+
+        # Get the slide count from the presentation
+        slide_count = len(presentations[presentation_id]["data"]["slides"])
         
-        # Create a zip file in memory
-        zip_buffer = io.BytesIO()
-        with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
-
-            json_str = json.dumps(json_data, indent=2, ensure_ascii=False)
-            json_bytes = json_str.encode('utf-8')
-
-            zip_file.writestr("presentation_data.json", json_bytes)
-
-            # Get the slide count from the presentation
-            slide_count = len(presentations[presentation_id]["data"]["slides"])
-            
-            # Add each slide's audio file to the zip
+        # Add each slide's audio file to the zip
+        if presentation_req.generate_voiceover:
             for slide_num in range(1, slide_count + 1):
                 # audio_filepath = os.path.join("audio_files", f"{presentation_id}_slide_{slide_num}.mp3")
                 audio_filepath = os.path.join("audio_files", presentation_id, f"slide_{slide_num}.mp3")   
@@ -454,23 +457,17 @@ async def generate_presentation_sync(
                     # Add file to zip with a friendly name
                     print(f"Adding {audio_filepath} to zip")
                     zip_file.write(audio_filepath, f"slide_{slide_num}_voiceover.mp3")
-        
-        # Seek to the beginning of the buffer
-        zip_buffer.seek(0)
-        # Clean up the audio files directory
-        delete_directory(f"audio_files/{presentation_id}")
-        
-        # Return the zip file
-        return Response(
-            content=zip_buffer.getvalue(),
-            media_type="application/zip",
-            headers={
-                "Content-Disposition": f"attachment; filename={presentation_id}_voiceovers.zip"
-            }
-        )    
     
-    return {
-        "presentation_id": presentation_id,
-        "status": "completed",
-        "data": presentations[presentation_id]["data"]
-    }
+    # Seek to the beginning of the buffer
+    zip_buffer.seek(0)
+    # Clean up the audio files directory
+    delete_directory(f"audio_files/{presentation_id}")
+    
+    # Return the zip file
+    return Response(
+        content=zip_buffer.getvalue(),
+        media_type="application/zip",
+        headers={
+            "Content-Disposition": f"attachment; filename={presentation_id}_voiceovers.zip"
+        }
+    )    

@@ -1,3 +1,4 @@
+#%%
 from pydantic import BaseModel, Field
 from typing import List, Dict, Any, Optional
 
@@ -37,8 +38,11 @@ class ValidationWithOutline(BaseModel):
 
 
 
+class OnscreenText(BaseModel):
+    text_list: List[str] = Field(description="List of text lines to be displayed on the slide. Each line should be separated by a newline character.")
+
 class SlideContent(BaseModel):
-    slide_onscreen_text: str = Field(description="The textual content with HTML markup that is shown on the slide")
+    slide_onscreen_text: OnscreenText = Field(description="The textual content which is shown on the slide.")
     slide_voiceover_text: str = Field(description="The text for the voiceover of this particular slide")
     slide_image_prompt: str = Field(description="A detailed prompt text to generate an image for this particular slide. This is always in English regardless of the language of the presentation")
 
