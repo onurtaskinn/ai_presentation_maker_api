@@ -16,7 +16,7 @@ import io
 import json
 
 
-from api.app import app, presentations, save_presentation
+from api.app import app, presentations
 from api.app import OUTLINE_THRESHOLD_SCORE, CONTENT_THRESHOLD_SCORE, IMAGE_THRESHOLD_SCORE
 from api.app import IMAGE_QUALITY_MODELS
 from data.datamodels import TopicCount, FullPresentationRequest, PresentationStatusResponse
@@ -31,7 +31,7 @@ from agents.outline_fixer_agent import call_outline_fixer_agent
 from agents.content_initial_generator_agent import call_content_initial_generator_agent
 from agents.content_tester_agent import call_content_tester_agent
 from agents.content_fixer_agent import call_content_fixer_agent
-from agents.image_generator_agent import call_image_generator_agent
+from agents.image_generator_agent import call_image_generator_agent, download_image_to_local
 from agents.image_tester_agent import call_image_tester_agent
 from agents.image_fixer_agent import call_image_fixer_agent
 from agents.voice_helper import generate_speech_with_elevenlabs, delete_directory
@@ -174,6 +174,8 @@ async def generate_full_presentation_task(
                         content = improved_content
                         max_attempts -= 1
 
+                    local_image_path = download_image_to_local(image_url, presentation_id, i+1)
+
                     if generate_voiceover:
                         # Generate voiceover
 
@@ -207,9 +209,7 @@ async def generate_full_presentation_task(
                         "number": i+1,
                         "title": slide.slide_title,
                         "focus": slide.slide_focus,
-                        "onscreen_text": merged_onscreen_text,
-                        "voiceover_text": content.slide_voiceover_text,
-                        "image_prompt": content.slide_image_prompt,
+                        "content": content,
                         "image_url": image_url
                     }
                     
@@ -238,8 +238,6 @@ async def generate_full_presentation_task(
                     crud.create_presentation_slides_batch(db, slides_to_save)
                 
                 # Save presentation to file
-                filepath = save_presentation(presentation_data, presentation_id)
-                presentations[presentation_id]["filepath"] = filepath
                 presentations[presentation_id]["data"] = presentation_data
                 presentations[presentation_id]["status"] = "completed"
                 presentations[presentation_id]["progress"] = {"completion": 100}
@@ -275,7 +273,6 @@ async def generate_full_presentation_task(
                 
                 # List to store slide data for database
                 slides_to_save = []
-                
                 # Generate content and images for each slide
                 for i, slide in enumerate(outline.slide_outlines):
                     slide_progress = 30 + (i / slide_count) * 70
@@ -294,6 +291,8 @@ async def generate_full_presentation_task(
                                   
                     # Generate image
                     image_url = call_image_generator_agent(content.slide_image_prompt, model)
+
+                    local_image_path = download_image_to_local(image_url, presentation_id, i+1)
 
                     if generate_voiceover:
                         # Generate voiceover
@@ -326,15 +325,11 @@ async def generate_full_presentation_task(
                         "number": i+1,
                         "title": slide.slide_title,
                         "focus": slide.slide_focus,
-                        "onscreen_text": merged_onscreen_text,
-                        "voiceover_text": content.slide_voiceover_text,
-                        "image_prompt": content.slide_image_prompt,
+                        "content": content,
                         "image_url": image_url
                     }
-                    
                     # Add to presentation data
-                    presentation_data["slides"].append(slide_data)
-                    
+                    presentation_data["slides"].append(slide_data)                    
                     # Create slide data for database
                     slide_to_save = schemas.PRESENTATION_SLIDESCreate(
                         presentation_id=presentation_id,
@@ -356,20 +351,17 @@ async def generate_full_presentation_task(
                     crud.create_presentation_slides_batch(db, slides_to_save)
                 
                 # Save presentation to file
-                filepath = save_presentation(presentation_data, presentation_id)
-                presentations[presentation_id]["filepath"] = filepath
                 presentations[presentation_id]["data"] = presentation_data
                 presentations[presentation_id]["status"] = "completed"
                 presentations[presentation_id]["progress"] = {"completion": 100}
-            
+
             except Exception as e:
                 presentations[presentation_id]["status"] = "error"
                 presentations[presentation_id]["error"] = str(e)
         
         end_time = time.time()
         generation_time = end_time - start_time
-        
-        # Update presentation history in the database
+
         if db:
             crud.update_presentation_history(db, presentation_id, total_tokens, generation_time)
             
@@ -419,6 +411,7 @@ async def generate_presentation_sync(
         organization_code=presentation_req.organization_code,
         db=db
     )
+
     
     # Return the full presentation data
     if presentations[presentation_id]["status"] == "error":
@@ -429,45 +422,40 @@ async def generate_presentation_sync(
         }
     
 
-
     json_data = {
         "presentation_id": presentation_id,
         "status": "completed",
         "data": presentations[presentation_id]["data"]
     }        
-    
-    # Create a zip file in memory
-    zip_buffer = io.BytesIO()
-    with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
 
-        json_str = json.dumps(json_data, indent=2, ensure_ascii=False)
-        json_bytes = json_str.encode('utf-8')
+    data = presentations[presentation_id]["data"]
+    id = data["id"]
+    presentation_title = data["title"]
+    slide_count = data["slide_count"]
+    slides = data["slides"]
 
-        zip_file.writestr("presentation_data.json", json_bytes)
+    for slide in slides:
+        slide_number = slide["number"]
+        slide_title = slide["title"]
+        onscreen_text = slide["content"].slide_onscreen_text.text_list
 
-        # Get the slide count from the presentation
-        slide_count = len(presentations[presentation_id]["data"]["slides"])
-        
-        # Add each slide's audio file to the zip
-        if presentation_req.generate_voiceover:
-            for slide_num in range(1, slide_count + 1):
-                # audio_filepath = os.path.join("audio_files", f"{presentation_id}_slide_{slide_num}.mp3")
-                audio_filepath = os.path.join("audio_files", presentation_id, f"slide_{slide_num}.mp3")   
-                if os.path.exists(audio_filepath):
-                    # Add file to zip with a friendly name
-                    print(f"Adding {audio_filepath} to zip")
-                    zip_file.write(audio_filepath, f"slide_{slide_num}_voiceover.mp3")
-    
-    # Seek to the beginning of the buffer
-    zip_buffer.seek(0)
-    # Clean up the audio files directory
+
+
+
     delete_directory(f"audio_files/{presentation_id}")
+    delete_directory(f"images/{presentation_id}")
+
+    return_response = {
+        "presentation_id": id,
+        "status": "completed",
+        "data": {
+            "title": presentation_title,
+            "slide_count": slide_count,
+        }
+    }
     
     # Return the zip file
     return Response(
-        content=zip_buffer.getvalue(),
-        media_type="application/zip",
-        headers={
-            "Content-Disposition": f"attachment; filename={presentation_id}_voiceovers.zip"
-        }
+        content=json.dumps(return_response),
+        media_type="application/json"
     )    

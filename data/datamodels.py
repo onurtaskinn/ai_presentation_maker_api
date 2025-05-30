@@ -39,7 +39,7 @@ class ValidationWithOutline(BaseModel):
 
 
 class OnscreenText(BaseModel):
-    text_list: List[str] = Field(description="List of text lines to be displayed on the slide. Each line should be separated by a newline character.")
+    text_list: List[str] = Field(description="List of text lines to be displayed on the slide.")
 
 class SlideContent(BaseModel):
     slide_onscreen_text: OnscreenText = Field(description="The textual content which is shown on the slide.")
