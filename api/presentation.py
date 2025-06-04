@@ -35,6 +35,9 @@ from agents.image_generator_agent import call_image_generator_agent, download_im
 from agents.image_tester_agent import call_image_tester_agent
 from agents.image_fixer_agent import call_image_fixer_agent
 from agents.voice_helper import generate_speech_with_elevenlabs, delete_directory
+from powepoint_deneme.pptx_generator import create_presentation_from_data
+
+
 
 
 
@@ -428,20 +431,31 @@ async def generate_presentation_sync(
         "data": presentations[presentation_id]["data"]
     }        
 
+
     data = presentations[presentation_id]["data"]
     id = data["id"]
     presentation_title = data["title"]
     slide_count = data["slide_count"]
     slides = data["slides"]
 
-    for slide in slides:
-        slide_number = slide["number"]
-        slide_title = slide["title"]
-        onscreen_text = slide["content"].slide_onscreen_text.text_list
+    if presentation_req.generate_voiceover:
+        for slide_num in range(1, slide_count + 1):
+            audio_filepath = os.path.join("audio_files", presentation_id, f"slide_{slide_num}.mp3")   
 
+    # Note: Images are already downloaded by download_image_to_local in the main process
+    for slide_num in range(1, slide_count + 1):
+        image_filepath = f"images/{presentation_id}/slide_{slide_num}.jpg"      
 
+    # Create PowerPoint file (will use the already downloaded local images)
+    print("Creating PowerPoint presentation...")
+    pptx_file_path = create_presentation_from_data(data)
+    
+    if pptx_file_path:
+        print(f"✓ PowerPoint file created: {pptx_file_path}")
+    else:
+        print("⚠ Warning: PowerPoint creation failed, continuing without PPTX file")
 
-
+    # Clean up temporary files (do this AFTER creating PowerPoint)
     delete_directory(f"audio_files/{presentation_id}")
     delete_directory(f"images/{presentation_id}")
 
@@ -451,11 +465,12 @@ async def generate_presentation_sync(
         "data": {
             "title": presentation_title,
             "slide_count": slide_count,
+            "pptx_file_path": pptx_file_path  # Include the PowerPoint file path
         }
     }
     
-    # Return the zip file
+    # Return the response
     return Response(
         content=json.dumps(return_response),
         media_type="application/json"
-    )    
+    )
