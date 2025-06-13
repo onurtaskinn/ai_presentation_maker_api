@@ -13,6 +13,13 @@ CONTENT_THRESHOLD_SCORE = 0
 IMAGE_THRESHOLD_SCORE = 0
 ACCESS_TOKEN_EXPIRE_HOURS = 24
 
+SOURCE_DOCUMENT_DIRECTORY = "source_documents"
+MAXIMUM_FILE_SIZE = 10 * 1024 * 1024 # 10MB
+MAXIMUM_TEXT_LENGTH = 80000 # 80000 characters
+MINIMUM_TEXT_LENGTH = 3500 # 3500 characters
+
+
+
 # Mapping for image quality to model
 IMAGE_QUALITY_MODELS = {
     "low": "fal-ai/flux/dev",

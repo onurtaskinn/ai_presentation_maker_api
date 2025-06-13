@@ -31,3 +31,7 @@ elevenlabs
 pydub
 
 Pillow
+
+PyMuPDF
+docx2txt
+python-multipart
