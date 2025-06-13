@@ -1,26 +1,21 @@
 # api/presentation.py
-from fastapi import Depends, BackgroundTasks, Request, UploadFile, File, HTTPException, Form
+from fastapi import Depends, Request, UploadFile, File, Form
 from fastapi.security import HTTPAuthorizationCredentials
-from fastapi.responses import FileResponse
 from fastapi.responses import Response
 
-from utils.file_operations import ensure_directory_exists, extract_text_from_docx, extract_text_from_pdf, allowed_file
-
-import os
+from utils.file_operations import process_uploaded_file
 import uuid
 from datetime import datetime
 import time
 from typing import Dict, Any, Tuple
 from datetime import timedelta, timezone
 from elevenlabs import VoiceSettings
-import zipfile
-import io
 import json
 
 
 from api.app import app, presentations
-from api.app import OUTLINE_THRESHOLD_SCORE, CONTENT_THRESHOLD_SCORE, IMAGE_THRESHOLD_SCORE, MAXIMUM_FILE_SIZE, MINIMUM_TEXT_LENGTH, MAXIMUM_TEXT_LENGTH
-from api.app import IMAGE_QUALITY_MODELS, SOURCE_DOCUMENT_DIRECTORY
+from api.app import OUTLINE_THRESHOLD_SCORE, CONTENT_THRESHOLD_SCORE, IMAGE_THRESHOLD_SCORE
+from api.app import IMAGE_QUALITY_MODELS
 from data.datamodels import TopicCount, FullPresentationRequest, PresentationOutline, SlideContent, SlideOutline
 from app.auth_middleware import auth_middleware, get_db
 from sqlalchemy.orm import Session
@@ -368,7 +363,6 @@ async def generate_full_presentation_task(
 @app.post("/generate-presentation", response_model=Dict[str, Any])
 async def generate_presentation_sync(
     request: Request,
-    # presentation_req: FullPresentationRequest, 
     presentation_req: str = Form(...),
     file: UploadFile = File(...),
     credentials: HTTPAuthorizationCredentials = Depends(auth_middleware.check_auth),
@@ -384,100 +378,9 @@ async def generate_presentation_sync(
     print(f"Generating presentation with ID: {presentation_id} for client: {client_id}")    
 
 
-    # file operations :
+    extracted_text = await process_uploaded_file(file)
 
-    # Validate file type
-    if not allowed_file(file.filename):
-        raise HTTPException(
-            status_code=400,             
-            detail={
-            "error_code": "PODCAST_ERROR_TYPE_3",
-            "message": "Invalid file type. Only PDF or Word files are accepted."
-            }
-        )
-    
-    # Read file content
-    try:
-        file_contents = await file.read()    
-    except Exception as e:
-        raise HTTPException(
-            status_code=500, 
-            detail={
-            "error_code": "PODCAST_ERROR_TYPE_4",
-            "message": f"Error reading the file: {str(e)}"
-            }
-        )
-
-    # Check file size
-    if len(file_contents) > MAXIMUM_FILE_SIZE:
-        raise HTTPException(
-            status_code=400, 
-            detail={
-            "error_code": "PODCAST_ERROR_TYPE_5",
-            "message": f"File size exceeds the maximum limit of {MAXIMUM_FILE_SIZE/1024/1024:.1f}MB."
-            }
-        )     
-
-
-    # Create uploads directory if it doesn't exist
-    ensure_directory_exists(SOURCE_DOCUMENT_DIRECTORY)
-    file_path = os.path.join(SOURCE_DOCUMENT_DIRECTORY, file.filename)
-
-    # Save the file
-    try:
-        with open(file_path, "wb") as f:
-            f.write(file_contents)
-
-    except Exception as e:
-        raise HTTPException(
-            status_code=500,  
-            detail={
-            "error_code": "PODCAST_ERROR_TYPE_6",
-            "message": f"Error saving the file: {str(e)}"
-            }
-        )       
-    
-    # Extract text from the file based on its type
-    try:
-        extracted_text = ""
-        if file.filename.lower().endswith(('.doc', '.docx')):
-            extracted_text = extract_text_from_docx(file_path)
-
-        elif file.filename.lower().endswith('.pdf'):
-            extracted_text = extract_text_from_pdf(file_path)
-
-    except Exception as e:
-        raise HTTPException(
-            status_code=500,  
-            detail={
-            "error_code": "PODCAST_ERROR_TYPE_7",
-            "message": f"Error extracting text from file: {str(e)}"
-            }
-        )
-    
-    # Check extracted text length
-    text_length = len(extracted_text)
-    if text_length > MAXIMUM_TEXT_LENGTH:
-        raise HTTPException(
-            status_code=400, 
-            detail={
-            "error_code": "PODCAST_ERROR_TYPE_8",
-            "message": f"Extracted text length ({text_length} characters) exceeds the maximum limit of {MAXIMUM_TEXT_LENGTH} characters."
-            }
-        )
-    
-    if text_length < MINIMUM_TEXT_LENGTH:
-        raise HTTPException(
-            status_code=400, 
-            detail={
-            "error_code": "PODCAST_ERROR_TYPE_9",
-            "message": f"Extracted text length ({text_length} characters) is below the minimum requirement of {MINIMUM_TEXT_LENGTH} characters."
-            }
-        )    
-
-
-    print(f"Extracted text length: {text_length} characters")
-    print(f"Extracted text: {extracted_text[:100]}...")  # Print first 100 characters for debugging
+    print(f"Extracted text from uploaded file: {extracted_text[:100]}...")  # Print first 100 characters for debugging
 
     # Initialize presentation in storage
     presentations[presentation_id] = {
